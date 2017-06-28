@@ -9,7 +9,7 @@
 import UIKit
 
 class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource {
-    var arrData = [[String]]()
+    var arrData = [[MyInfo]]()
     @IBOutlet weak var tableView: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,9 +17,12 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         
         tableView.register(UINib(nibName:"MyHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "MyHeaderView")
         for i in 1...3 {
-            var arrStr = [String]()
+            var arrStr = [MyInfo]()
             for j in 1...arc4random() % 20 + 1 {
-                arrStr.append("\(i),\(j)")
+                let info = MyInfo()
+                info.name = "\(i)-\(j)"
+                info.index = Int(j)
+                arrStr.append(info)
             }
             arrData.append(arrStr)
         }
@@ -39,8 +42,17 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath)
-        cell.textLabel?.text = "\(indexPath.section+1)-\(indexPath.row+1)"
+        let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath) as! MyCell
+        let info = arrData[indexPath.section][indexPath.row]
+        cell.setInfo(info: info, indexPath: indexPath)
+        cell.block = {(cell:MyCell,indexPath:IndexPath,event:TouchEvent) in
+            let touchInfo = self.arrData[indexPath.section][indexPath.row]
+            print(touchInfo.name)
+            print(cell)
+            print(indexPath)
+            print(event)
+        }
+        
         return cell
     }
     
@@ -55,6 +67,14 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 20
     }
-    
+}
 
+class MyInfo {
+    var name:String!
+    var index:Int!
+}
+class MySuperView: UIView {
+    override func draw(_ rect: CGRect) {
+        self.layoutIfNeeded()
+    }
 }
